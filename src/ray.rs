@@ -1,4 +1,4 @@
-use crate::math::{Point, float3};
+use crate::math::{float3, Point};
 
 #[derive(Clone, Copy)]
 pub struct Ray {
@@ -10,13 +10,16 @@ impl Ray {
     pub fn at(&self, t: f32) -> Point {
         self.origin + self.direction * t
     }
+}
 
-    pub fn hit_sphere(&self, circle_center: &Point, radius: f32) -> bool {
-        let oc = self.origin.as_vec() - circle_center.as_vec();
-        let a = self.direction.dot(self.direction);
-        let b = 2.0 * oc.dot(self.direction);
-        let c = oc.dot(oc) - radius * radius;
-        let discriminant = b * b - 4.0 * a * c;
-        return discriminant > 0.0;
-    }
+#[derive(Clone, Copy)]
+pub struct Hit {
+    pub point: Point,
+    pub normal: float3,
+    pub t: f32,
+    pub is_front_face: bool,
+}
+
+pub trait HitTest {
+    fn test(&self, ray: &Ray, t_min: f32, t_max: f32) -> Option<Hit>;
 }

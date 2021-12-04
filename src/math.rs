@@ -39,12 +39,34 @@ impl float3 {
         other.normalize();
         other
     }
+}
 
-    pub fn dot(&self, rhs: Self) -> f32 {
+pub trait VectorOps<Rhs = Self> {
+    fn dot(&self, rhs: Rhs) -> f32;
+
+    fn cross(&self, rhs: Rhs) -> Self;
+}
+
+impl VectorOps for float3 {
+    fn dot(&self, rhs: Self) -> f32 {
         self.0[0] * rhs.0[0] + self.0[1] * rhs.0[1] + self.0[2] * rhs.0[2]
     }
 
-    pub fn cross(&self, rhs: Self) -> Self {
+    fn cross(&self, rhs: Self) -> Self {
+        Self([
+            self.0[1] * rhs.0[2] - self.0[2] * rhs.0[1],
+            self.0[2] * rhs.0[0] - self.0[0] * rhs.0[2],
+            self.0[0] * rhs.0[1] - self.0[1] * rhs.0[0],
+        ])
+    }
+}
+
+impl VectorOps<&Self> for float3 {
+    fn dot(&self, rhs: &Self) -> f32 {
+        self.0[0] * rhs.0[0] + self.0[1] * rhs.0[1] + self.0[2] * rhs.0[2]
+    }
+
+    fn cross(&self, rhs: &Self) -> Self {
         Self([
             self.0[1] * rhs.0[2] - self.0[2] * rhs.0[1],
             self.0[2] * rhs.0[0] - self.0[0] * rhs.0[2],
