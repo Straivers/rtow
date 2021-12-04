@@ -2,6 +2,7 @@ mod bmp;
 mod color;
 mod image;
 mod math;
+mod ray;
 
 fn main() {
     let width = 256;
