@@ -1,6 +1,7 @@
 mod bmp;
 mod color;
 mod image;
+mod math;
 
 fn main() {
     let width = 256;
