@@ -39,11 +39,11 @@ impl Header {
 
     /// Writes the header to the writer in packed form.
     fn write_to_buffer(&self, writer: &mut dyn std::io::Write) -> Result<(), std::io::Error> {
-        writer.write(&self.magic)?;
-        writer.write(as_u8_slice(&self.file_size))?;
-        writer.write(as_u8_slice(&self.reserved0))?;
-        writer.write(as_u8_slice(&self.reserved1))?;
-        writer.write(as_u8_slice(&self.image_offset))?;
+        writer.write_all(&self.magic)?;
+        writer.write_all(as_u8_slice(&self.file_size))?;
+        writer.write_all(as_u8_slice(&self.reserved0))?;
+        writer.write_all(as_u8_slice(&self.reserved1))?;
+        writer.write_all(as_u8_slice(&self.image_offset))?;
         Ok(())
     }
 }
@@ -84,9 +84,9 @@ impl InfoHeader {
     const FILE_SIZE: u32 = std::mem::size_of::<Self>() as u32;
 
     pub fn new(image: &Image) -> Self {
-        let image_size = (image.width() + (image.width() % 4) as u32)
-            * image.height()
-            * image.bytes_per_pixel() as u32;
+        let bytes_per_line = image.line(0).len() as u32;
+        let image_size = (bytes_per_line + (bytes_per_line % 4)) * image.height();
+
         Self {
             header_size: InfoHeader::FILE_SIZE,
             image_width: image.width().try_into().unwrap(),
@@ -125,11 +125,11 @@ pub fn encode(image: &Image, buffer: &mut Vec<u8>) {
     let header = Header::for_info_header(&info_header);
 
     header.write_to_buffer(buffer).unwrap();
-    buffer.write(as_u8_slice(&info_header)).unwrap();
+    buffer.write_all(as_u8_slice(&info_header)).unwrap();
 
     for y in 0 .. image.height() {
-        buffer.write(pixels.line(y)).unwrap();
-        buffer.write(&align_bytes[0..align]).unwrap();
+        buffer.write_all(pixels.line(y)).unwrap();
+        buffer.write_all(&align_bytes[0..align]).unwrap();
     }
 }
 
