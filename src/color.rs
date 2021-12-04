@@ -7,17 +7,6 @@ pub struct RgbU8 {
 }
 
 impl RgbU8 {
-    pub const BITS: usize = Self::BYTES * u8::BITS as usize;
-    pub const BYTES: usize = std::mem::size_of::<Self>();
-
-    pub fn from_f32(r: f32, g: f32, b: f32) -> Self {
-        Self {
-            r: (r * 255.999) as u8,
-            g: (g * 255.999) as u8,
-            b: (b * 255.999) as u8,
-        }
-    }
-
     pub fn as_u8(self) -> [u8; 3] {
         [self.r, self.g, self.b]
     }
@@ -43,9 +32,7 @@ impl RgbF32 {
     pub const BLACK: Self = Self::new(0.0, 0.0, 0.0);
 
     pub const fn new(r: f32, g: f32, b: f32) -> Self {
-        Self {
-            r, g, b
-        }
+        Self { r, g, b }
     }
 }
 

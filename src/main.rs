@@ -6,13 +6,13 @@ mod image;
 mod math;
 mod ray;
 
-use std::time::{Instant};
+use std::time::Instant;
 
-use rand::random;
 use camera::Camera;
-use color::{RgbU8, RgbF32};
+use color::{RgbF32, RgbU8};
 use hittable::{Hittable, Sphere};
 use math::{float3, Point};
+use rand::random;
 use ray::{HitTest, Ray};
 
 fn ray_color(ray: &Ray, hittables: &[Hittable]) -> RgbF32 {
@@ -58,10 +58,10 @@ fn main() {
     for j in 0..height {
         for i in 0..width {
             let mut color = RgbF32::BLACK;
-            for _ in 0 .. samples {
+            for _ in 0..samples {
                 let u = (i as f32 + random::<f32>()) / (width as f32 - 1.0);
                 let v = (j as f32 + random::<f32>()) / (height as f32 - 1.0);
-    
+
                 let ray = camera.get(u, v);
                 color += ray_color(&ray, &world);
             }
@@ -74,7 +74,7 @@ fn main() {
 
     println!("Render Time: {:#?}", end_time.duration_since(start_time));
 
-    let image = image::Image::new(width, height, image::Format::RGB8, pixels);
+    let image = image::Image::new(width, height, image::Format::RgbU8, pixels);
     let mut buffer = Vec::new();
     bmp::encode(&image, &mut buffer);
 

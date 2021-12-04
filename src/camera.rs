@@ -1,4 +1,7 @@
-use crate::{math::{float3, Point}, ray::Ray};
+use crate::{
+    math::{float3, Point},
+    ray::Ray,
+};
 
 pub struct Camera {
     origin: Point,
@@ -24,7 +27,7 @@ impl Camera {
             origin,
             lower_left_corner,
             horizontal,
-            vertical
+            vertical,
         }
     }
 

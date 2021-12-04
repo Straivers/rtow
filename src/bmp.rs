@@ -116,7 +116,7 @@ fn as_u8_slice<T: Sized>(o: &T) -> &[u8] {
 }
 
 pub fn encode(image: &Image, buffer: &mut Vec<u8>) {
-    let pixels = image.clone_as_format(ImageFormat::BGR8);
+    let pixels = image.clone_as_format(ImageFormat::BgrU8);
 
     let align_bytes: [u8; 4] = [0, 0, 0, 0];
     let align = image.width() as usize % 4;
@@ -130,16 +130,5 @@ pub fn encode(image: &Image, buffer: &mut Vec<u8>) {
     for y in 0..image.height() {
         buffer.write_all(pixels.line(y)).unwrap();
         buffer.write_all(&align_bytes[0..align]).unwrap();
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn header_sizes() {
-        assert_eq!(Header::FILE_SIZE, 14);
-        assert_eq!(InfoHeader::FILE_SIZE, 40);
     }
 }

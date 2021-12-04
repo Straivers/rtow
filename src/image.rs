@@ -1,9 +1,21 @@
-use crate::color::RgbU8;
-
 #[derive(Clone, Copy)]
 pub enum Format {
-    RGB8,
-    BGR8,
+    RgbU8,
+    BgrU8,
+}
+
+impl Format {
+    pub fn bits_per_pixel(&self) -> u8 {
+        match self {
+            Format::RgbU8 | Format::BgrU8 => 8,
+        }
+    }
+
+    pub fn bytes_per_pixel(&self) -> u8 {
+        match self {
+            Self::RgbU8 | Format::BgrU8 => 24,
+        }
+    }
 }
 
 /// Stored in row-order from bottom-to-top.
@@ -25,10 +37,6 @@ impl Image {
         }
     }
 
-    pub fn size(&self) -> usize {
-        self.buffer.len()
-    }
-
     pub fn width(&self) -> u32 {
         self.width
     }
@@ -38,11 +46,11 @@ impl Image {
     }
 
     pub fn bits_per_pixel(&self) -> u8 {
-        RgbU8::BITS as u8
+        self.format.bits_per_pixel()
     }
 
     pub fn bytes_per_pixel(&self) -> u8 {
-        RgbU8::BYTES as u8
+        self.format.bytes_per_pixel()
     }
 
     pub fn line(&self, line: u32) -> &[u8] {
@@ -53,9 +61,9 @@ impl Image {
 
     pub fn clone_as_format(&self, format: Format) -> Self {
         match self.format {
-            Format::RGB8 => match format {
-                Format::RGB8 => self.clone(),
-                Format::BGR8 => {
+            Format::RgbU8 => match format {
+                Format::RgbU8 => self.clone(),
+                Format::BgrU8 => {
                     let mut clone = self.clone();
                     for pixel in clone.buffer.chunks_mut(3) {
                         pixel.swap(0, 2);
@@ -63,15 +71,15 @@ impl Image {
                     clone
                 }
             },
-            Format::BGR8 => match format {
-                Format::RGB8 => {
+            Format::BgrU8 => match format {
+                Format::RgbU8 => {
                     let mut clone = self.clone();
                     for pixel in clone.buffer.chunks_mut(3) {
                         pixel.swap(0, 2);
                     }
                     clone
                 }
-                Format::BGR8 => self.clone(),
+                Format::BgrU8 => self.clone(),
             },
         }
     }
