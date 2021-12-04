@@ -3,7 +3,7 @@
 
 use std::io::Write;
 
-use crate::image::{Image, Format as ImageFormat};
+use crate::image::{Format as ImageFormat, Image};
 
 const PIXELS_PER_METER_72_DPI: i32 = 2835;
 
@@ -127,7 +127,7 @@ pub fn encode(image: &Image, buffer: &mut Vec<u8>) {
     header.write_to_buffer(buffer).unwrap();
     buffer.write_all(as_u8_slice(&info_header)).unwrap();
 
-    for y in 0 .. image.height() {
+    for y in 0..image.height() {
         buffer.write_all(pixels.line(y)).unwrap();
         buffer.write_all(&align_bytes[0..align]).unwrap();
     }
