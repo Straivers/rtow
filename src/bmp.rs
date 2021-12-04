@@ -3,7 +3,7 @@
 
 use std::io::Write;
 
-use crate::image::Image;
+use crate::image::{Image, Format as ImageFormat};
 
 const PIXELS_PER_METER_72_DPI: i32 = 2835;
 
@@ -84,11 +84,13 @@ impl InfoHeader {
     const FILE_SIZE: u32 = std::mem::size_of::<Self>() as u32;
 
     pub fn new(image: &Image) -> Self {
-        let image_size = (image.width + (image.width % 4) as u32) * image.height * image.bytes_per_pixel() as u32;
+        let image_size = (image.width() + (image.width() % 4) as u32)
+            * image.height()
+            * image.bytes_per_pixel() as u32;
         Self {
             header_size: InfoHeader::FILE_SIZE,
-            image_width: image.width.try_into().unwrap(),
-            image_height: image.height.try_into().unwrap(),
+            image_width: image.width().try_into().unwrap(),
+            image_height: image.height().try_into().unwrap(),
             color_planes: 1,
             bits_per_pixel: image.bits_per_pixel().into(),
             compression_method: CompressionMethod::BI_RGB,
@@ -114,25 +116,10 @@ fn as_u8_slice<T: Sized>(o: &T) -> &[u8] {
 }
 
 pub fn encode(image: &Image, buffer: &mut Vec<u8>) {
-    let mut pixels = image.buffer.clone();
-    let pixel_data = {
-        let colors = pixels.as_mut_slice();
-        let pixel_data: &mut [[u8; 3]] = unsafe {
-            std::slice::from_raw_parts_mut(
-                colors.as_mut_ptr().cast(),
-                colors.len(),
-            )
-        };
-
-        for pixel in pixel_data.iter_mut() {
-            pixel.swap(0, 2);
-        }
-
-        pixel_data
-    };
+    let pixels = image.clone_as_format(ImageFormat::BGR8);
 
     let align_bytes: [u8; 4] = [0, 0, 0, 0];
-    let align = image.width as usize % 4;
+    let align = image.width() as usize % 4;
 
     let info_header = InfoHeader::new(image);
     let header = Header::for_info_header(&info_header);
@@ -140,16 +127,9 @@ pub fn encode(image: &Image, buffer: &mut Vec<u8>) {
     header.write_to_buffer(buffer).unwrap();
     buffer.write(as_u8_slice(&info_header)).unwrap();
 
-    let bytes_per_line = image.width as usize * image.bytes_per_pixel() as usize;
-    let mut y_offset = 0;
-    while y_offset < pixel_data.len() {
-        buffer
-            .write(unsafe {
-                std::slice::from_raw_parts(pixel_data.as_ptr().add(y_offset).cast(), bytes_per_line)
-            })
-            .unwrap();
+    for y in 0 .. image.height() {
+        buffer.write(pixels.line(y)).unwrap();
         buffer.write(&align_bytes[0..align]).unwrap();
-        y_offset += image.width as usize + align;
     }
 }
 
