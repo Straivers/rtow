@@ -1,4 +1,4 @@
-use crate::color::Rgb;
+use crate::color::RgbU8;
 
 #[derive(Clone, Copy)]
 pub enum Format {
@@ -38,11 +38,11 @@ impl Image {
     }
 
     pub fn bits_per_pixel(&self) -> u8 {
-        Rgb::BITS as u8
+        RgbU8::BITS as u8
     }
 
     pub fn bytes_per_pixel(&self) -> u8 {
-        Rgb::BYTES as u8
+        RgbU8::BYTES as u8
     }
 
     pub fn line(&self, line: u32) -> &[u8] {
