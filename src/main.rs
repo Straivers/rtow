@@ -9,6 +9,10 @@ use ray::Ray;
 use color::Rgb;
 
 fn ray_color(ray: &Ray) -> Rgb {
+    if ray.hit_sphere(&Point::new(0.0, 0.0, -1.0), 0.5) {
+        return Rgb::from_f32(1.0, 0.0, 0.0);
+    }
+
     let dir = ray.direction.normalized();
     let t = 0.5 * (dir.y() + 1.0);
     let c = (1.0 - t) * float3::new(1.0, 1.0, 1.0) + t * float3::new(0.5, 0.7, 1.0);

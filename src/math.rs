@@ -1,4 +1,4 @@
-use std::ops::{Add, Div, Mul, Neg, Sub, DivAssign};
+use std::ops::{Add, Div, DivAssign, Mul, Neg, Sub};
 
 #[allow(non_camel_case_types)]
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -40,19 +40,15 @@ impl float3 {
         other
     }
 
-    pub fn dot(&self, rhs: Self) -> Self {
-        Self([
-            self.0[0] * rhs.0[0],
-            self.0[1] * rhs.0[1],
-            self.0[2] * rhs.0[2],
-        ])
+    pub fn dot(&self, rhs: Self) -> f32 {
+        self.0[0] * rhs.0[0] + self.0[1] * rhs.0[1] + self.0[2] * rhs.0[2]
     }
 
     pub fn cross(&self, rhs: Self) -> Self {
         Self([
             self.0[1] * rhs.0[2] - self.0[2] * rhs.0[1],
             self.0[2] * rhs.0[0] - self.0[0] * rhs.0[2],
-            self.0[0] * rhs.0[1] - self.0[1] * rhs.0[0]
+            self.0[0] * rhs.0[1] - self.0[1] * rhs.0[0],
         ])
     }
 }
@@ -68,6 +64,17 @@ impl Neg for float3 {
 impl Add for float3 {
     type Output = Self;
     fn add(self, rhs: Self) -> Self {
+        Self([
+            self.0[0] + rhs.0[0],
+            self.0[1] + rhs.0[1],
+            self.0[2] + rhs.0[2],
+        ])
+    }
+}
+
+impl Add<&Self> for float3 {
+    type Output = Self;
+    fn add(self, rhs: &Self) -> Self {
         Self([
             self.0[0] + rhs.0[0],
             self.0[1] + rhs.0[1],
@@ -103,6 +110,17 @@ impl Sub for float3 {
     }
 }
 
+impl Sub<&Self> for float3 {
+    type Output = Self;
+    fn sub(self, rhs: &Self) -> Self {
+        Self([
+            self.0[0] - rhs.0[0],
+            self.0[1] - rhs.0[1],
+            self.0[2] - rhs.0[2],
+        ])
+    }
+}
+
 impl Sub<f32> for float3 {
     type Output = Self;
     fn sub(self, rhs: f32) -> Self {
@@ -113,6 +131,17 @@ impl Sub<f32> for float3 {
 impl Mul for float3 {
     type Output = Self;
     fn mul(self, rhs: Self) -> Self {
+        Self([
+            self.0[0] * rhs.0[0],
+            self.0[1] * rhs.0[1],
+            self.0[2] * rhs.0[2],
+        ])
+    }
+}
+
+impl Mul<&Self> for float3 {
+    type Output = Self;
+    fn mul(self, rhs: &Self) -> Self {
         Self([
             self.0[0] * rhs.0[0],
             self.0[1] * rhs.0[1],
@@ -138,6 +167,17 @@ impl Mul<float3> for f32 {
 impl Div for float3 {
     type Output = Self;
     fn div(self, rhs: Self) -> Self {
+        Self([
+            self.0[0] / rhs.0[0],
+            self.0[1] / rhs.0[1],
+            self.0[2] / rhs.0[2],
+        ])
+    }
+}
+
+impl Div<&Self> for float3 {
+    type Output = Self;
+    fn div(self, rhs: &Self) -> Self {
         Self([
             self.0[0] / rhs.0[0],
             self.0[1] / rhs.0[1],
@@ -208,6 +248,17 @@ impl Sub<float3> for Point {
     }
 }
 
+impl Sub<&float3> for Point {
+    type Output = Self;
+    fn sub(self, rhs: &float3) -> Self {
+        Self([
+            self.0[0] - rhs.0[0],
+            self.0[1] - rhs.0[1],
+            self.0[2] - rhs.0[2],
+        ])
+    }
+}
+
 impl Mul<float3> for Point {
     type Output = Self;
     fn mul(self, rhs: float3) -> Self {
@@ -219,9 +270,31 @@ impl Mul<float3> for Point {
     }
 }
 
+impl Mul<&float3> for Point {
+    type Output = Self;
+    fn mul(self, rhs: &float3) -> Self {
+        Self([
+            self.0[0] * rhs.0[0],
+            self.0[1] * rhs.0[1],
+            self.0[2] * rhs.0[2],
+        ])
+    }
+}
+
 impl Div<float3> for Point {
     type Output = Self;
     fn div(self, rhs: float3) -> Self {
+        Self([
+            self.0[0] / rhs.0[0],
+            self.0[1] / rhs.0[1],
+            self.0[2] / rhs.0[2],
+        ])
+    }
+}
+
+impl Div<&float3> for Point {
+    type Output = Self;
+    fn div(self, rhs: &float3) -> Self {
         Self([
             self.0[0] / rhs.0[0],
             self.0[1] / rhs.0[1],
