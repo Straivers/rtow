@@ -6,6 +6,8 @@ mod image;
 mod math;
 mod ray;
 
+use std::time::{Instant};
+
 use rand::random;
 use camera::Camera;
 use color::{RgbU8, RgbF32};
@@ -29,7 +31,11 @@ fn main() {
     // Image
     let width = 720;
     let height = 720;
-    let samples = 32;
+
+    #[cfg(debug_assertions)]
+    let samples = 16;
+    #[cfg(not(debug_assertions))]
+    let samples = 100;
 
     // World
     let world = vec![
@@ -47,6 +53,8 @@ fn main() {
     let camera = Camera::new(width, height);
     let mut pixels = Vec::new();
 
+    let start_time = Instant::now();
+
     for j in 0..height {
         for i in 0..width {
             let mut color = RgbF32::BLACK;
@@ -61,6 +69,10 @@ fn main() {
             pixels.extend_from_slice(&RgbU8::from(&color).as_u8());
         }
     }
+
+    let end_time = Instant::now();
+
+    println!("Render Time: {:#?}", end_time.duration_since(start_time));
 
     let image = image::Image::new(width, height, image::Format::RGB8, pixels);
     let mut buffer = Vec::new();
